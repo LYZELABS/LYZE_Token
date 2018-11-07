@@ -297,7 +297,7 @@ contract Ownable {
   event AdminTransferred(address indexed previousAdmin, address indexed newAdmin);
 
   /**
-   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
+   * @dev The Ownable constructor sets the original owner and admin of the contract to the sender
    * account.
    */
   constructor() internal {
@@ -328,14 +328,14 @@ contract Ownable {
   }
 
   /**
-   * @return the address of the owner.
+   * @return the address of the Admin.
    */
   function admin() public view returns(address) {
     return _admin;
   }
 
   /**
-   * @dev Throws if called by any account other than the owner.
+   * @dev Throws if called by any account other than the Admin.
    */
   modifier onlyAdmin() {
     require(isAdmin());
@@ -343,7 +343,7 @@ contract Ownable {
   }
 
   /**
-   * @return true if `msg.sender` is the owner of the contract.
+   * @return true if `msg.sender` is the admin of the contract.
    */
   function isAdmin() public view returns(bool) {
     return msg.sender == _admin;
@@ -368,7 +368,7 @@ contract Ownable {
   }
 
   /**
-   * @dev Allows the current minter to transfer access of the contract mint, burn function to a newAdmin.
+   * @dev Allows the current admin to transfer access of the contract mint, burn function to a newAdmin.
    * @param newAdmin The address to transfer admin to.
    */
   function transferAdmin(address newAdmin) public onlyOwner {
