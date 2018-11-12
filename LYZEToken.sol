@@ -475,7 +475,7 @@ contract LYZEToken is ERC20, Ownable {
   /**
   * @dev Maximum MultiTransfer Count Allowed
   */
-  function maxMultiTransferCount() public view onlyAdmin returns (uint256) {
+  function getMaxMultiTransferCount() public view onlyAdmin returns (uint256) {
     return _maxMultiTransferCount;
   }
 
@@ -490,7 +490,7 @@ contract LYZEToken is ERC20, Ownable {
   /**
   * @dev Maximum MultiTransfer Value Allowed
   */
-  function maxMultiTransferValue() public view onlyAdmin returns (uint256) {
+  function getMaxMultiTransferValue() public view onlyAdmin returns (uint256) {
     return _maxMultiTransferValue;
   }
 
