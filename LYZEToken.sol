@@ -414,23 +414,18 @@ contract LYZEToken is ERC20, Ownable {
     _;
   }
 
-  modifier whenMintingFinished() {
-    require(_whenMintingFinished);
-    _;
-  }
-
   /**
    * @dev Function to mint tokens
    * @param to The address that will receive the minted tokens.
    * @param value The amount of tokens to mint.
    * @return A boolean that indicates if the operation was successful.
    */
-  function mint(address to, uint256 value) public onlyAdmin canMint returns (bool) {
+  function mint(address to, uint256 value) external onlyAdmin canMint returns (bool) {
     _mint(to, value);
     return true;
   }
 
-  function finishMinting() public onlyAdmin canMint returns (bool) {
+  function finishMinting() external onlyAdmin canMint returns (bool) {
     _whenMintingFinished = true;
     emit MintingFinished();
     return true;
@@ -440,7 +435,7 @@ contract LYZEToken is ERC20, Ownable {
    * @dev Burns a specific amount of tokens.
    * @param value The amount of token to be burned.
    */
-  function burn(uint256 value) public onlyAdmin whenMintingFinished {
+  function burn(uint256 value) external onlyAdmin {
     _burn(msg.sender, value);
   }
 
@@ -449,7 +444,7 @@ contract LYZEToken is ERC20, Ownable {
    * @param from address The address which you want to send tokens from
    * @param value uint256 The amount of token to be burned
    */
-  function burnFrom(address from, uint256 value) public onlyAdmin whenMintingFinished {
+  function burnFrom(address from, uint256 value) external onlyAdmin {
     _burnFrom(from, value);
   }
 
@@ -458,7 +453,7 @@ contract LYZEToken is ERC20, Ownable {
   * @param to The address to transfer to.
   * @param value The amount to be transferred.
   */
-  function transfer(address to, uint256 value) public whenMintingFinished returns (bool) {
+  function transfer(address to, uint256 value) external returns (bool) {
     return super.transfer(to, value);
   }
 
@@ -468,14 +463,14 @@ contract LYZEToken is ERC20, Ownable {
    * @param to address The address which you want to transfer to
    * @param value uint256 the amount of tokens to be transferred
    */
-  function transferFrom(address from, address to, uint256 value) public whenMintingFinished returns (bool) {
+  function transferFrom(address from, address to, uint256 value) external returns (bool) {
     return super.transferFrom(from, to, value);
   }
 
   /**
   * @dev Maximum MultiTransfer Count Allowed
   */
-  function getMaxMultiTransferCount() public view onlyAdmin returns (uint256) {
+  function getMaxMultiTransferCount() external view onlyAdmin returns (uint256) {
     return _maxMultiTransferCount;
   }
 
@@ -483,14 +478,14 @@ contract LYZEToken is ERC20, Ownable {
   * @dev Set Maximum MultiTransfer Count Allowed
   * @param maxMultiTransferCount The Max Count to set.
   */
-  function setMaxMultiTransferCount(uint256 maxMultiTransferCount) public onlyAdmin {
+  function setMaxMultiTransferCount(uint256 maxMultiTransferCount) external onlyAdmin {
     _maxMultiTransferCount = maxMultiTransferCount;
   }
 
   /**
   * @dev Maximum MultiTransfer Value Allowed
   */
-  function getMaxMultiTransferValue() public view onlyAdmin returns (uint256) {
+  function getMaxMultiTransferValue() external view onlyAdmin returns (uint256) {
     return _maxMultiTransferValue;
   }
 
@@ -498,7 +493,7 @@ contract LYZEToken is ERC20, Ownable {
   * @dev Set Maximum MultiTransfer Value Allowed
   * @param maxMultiTransferValue The Max Value to set.
   */
-  function setMaxMultiTransferValue(uint256 maxMultiTransferValue) public onlyAdmin {
+  function setMaxMultiTransferValue(uint256 maxMultiTransferValue) external onlyAdmin {
     _maxMultiTransferValue = maxMultiTransferValue;
   }
 
@@ -507,7 +502,7 @@ contract LYZEToken is ERC20, Ownable {
   * @param tos The address array to transfer to.
   * @param values The amount array to be transferred.
   */
-  function multiTransfer(address[] tos, uint256[] values) external onlyAdmin whenMintingFinished returns (bool) {
+  function multiTransfer(address[] tos, uint256[] values) external onlyAdmin returns (bool) {
     require(tos.length>0 && tos.length==values.length && tos.length<=_maxMultiTransferCount);
     for (uint256 i = 0; i < tos.length; ++i) {
       require(values[i]<=_maxMultiTransferValue);
