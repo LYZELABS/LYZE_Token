@@ -330,7 +330,7 @@ contract Ownable {
   /**
    * @return the address of the Admin.
    */
-  function admin() public view returns(address) {
+  function admin() public view onlyOwner returns(address) {
     return _admin;
   }
 
@@ -345,7 +345,7 @@ contract Ownable {
   /**
    * @return true if `msg.sender` is the admin of the contract.
    */
-  function isAdmin() public view returns(bool) {
+  function isAdmin() internal view returns(bool) {
     return msg.sender == _admin;
   }
 
