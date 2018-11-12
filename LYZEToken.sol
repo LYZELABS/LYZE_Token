@@ -481,7 +481,7 @@ contract LYZEToken is ERC20, Ownable {
 
   /**
   * @dev Set Maximum MultiTransfer Count Allowed
-  * @param maxMultiTransferValue The Max Count to set.
+  * @param maxMultiTransferCount The Max Count to set.
   */
   function setMaxMultiTransferCount(uint256 maxMultiTransferCount) public onlyAdmin {
     _maxMultiTransferCount = maxMultiTransferCount;
