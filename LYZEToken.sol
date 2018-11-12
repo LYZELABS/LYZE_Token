@@ -394,6 +394,9 @@ contract LYZEToken is ERC20, Ownable {
 
   uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** 18);
 
+  uint256 private _maxMultiTransferCount = 100;
+  uint256 private _maxMultiTransferValue = 100000;
+
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
@@ -450,7 +453,7 @@ contract LYZEToken is ERC20, Ownable {
     _burnFrom(from, value);
   }
 
-    /**
+  /**
   * @dev Transfer token for a specified address
   * @param to The address to transfer to.
   * @param value The amount to be transferred.
@@ -468,4 +471,50 @@ contract LYZEToken is ERC20, Ownable {
   function transferFrom(address from, address to, uint256 value) public whenMintingFinished returns (bool) {
     return super.transferFrom(from, to, value);
   }
+
+  /**
+  * @dev Maximum MultiTransfer Count Allowed
+  */
+  function maxMultiTransferCount() public view onlyAdmin returns (uint256) {
+    return _maxMultiTransferCount;
+  }
+
+  /**
+  * @dev Set Maximum MultiTransfer Count Allowed
+  * @param maxMultiTransferValue The Max Count to set.
+  */
+  function setMaxMultiTransferCount(uint256 maxMultiTransferCount) public onlyAdmin {
+    _maxMultiTransferCount = maxMultiTransferCount;
+  }
+
+  /**
+  * @dev Maximum MultiTransfer Value Allowed
+  */
+  function maxMultiTransferValue() public view onlyAdmin returns (uint256) {
+    return _maxMultiTransferValue;
+  }
+
+  /**
+  * @dev Set Maximum MultiTransfer Value Allowed
+  * @param maxMultiTransferValue The Max Value to set.
+  */
+  function setMaxMultiTransferValue(uint256 maxMultiTransferValue) public onlyAdmin {
+    _maxMultiTransferValue = maxMultiTransferValue;
+  }
+
+  /**
+  * @dev Transfer token for a specified address array
+  * @param tos The address array to transfer to.
+  * @param values The amount array to be transferred.
+  */
+  function multiTransfer(address[] tos, uint256[] values) external onlyAdmin whenMintingFinished returns (bool) {
+    require(tos.length>0 && tos.length==values.length && tos.length<=_maxMultiTransferCount);
+    for (uint256 i = 0; i < tos.length; ++i) {
+      require(values[i]<=_maxMultiTransferValue);
+      uint256 value = values[i].mul(10**uint256(decimals()));
+      _transfer(msg.sender, tos[i], value);
+    }
+    return true;
+  }
+
 }
