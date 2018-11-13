@@ -316,15 +316,8 @@ contract Ownable {
    * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
-    require(isOwner());
+    require(msg.sender == _owner);
     _;
-  }
-
-  /**
-   * @return true if `msg.sender` is the owner of the contract.
-   */
-  function isOwner() public view returns(bool) {
-    return msg.sender == _owner;
   }
 
   /**
@@ -338,15 +331,8 @@ contract Ownable {
    * @dev Throws if called by any account other than the Admin.
    */
   modifier onlyAdmin() {
-    require(isAdmin());
+    require(msg.sender == _admin);
     _;
-  }
-
-  /**
-   * @return true if `msg.sender` is the admin of the contract.
-   */
-  function isAdmin() internal view returns(bool) {
-    return msg.sender == _admin;
   }
 
   /**
@@ -394,7 +380,8 @@ contract LYZEToken is ERC20, Ownable {
 
   uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** 18);
 
-  uint256 private _maxMultiTransferCount = 100;
+  uint8 private _multiTransferUnit = 18;
+  uint16 private _maxMultiTransferCount = 50;
   uint256 private _maxMultiTransferValue = 100000;
 
   /**
@@ -405,12 +392,12 @@ contract LYZEToken is ERC20, Ownable {
   }
 
   
-  bool private _whenMintingFinished = false;
+  bool private _mintingFinished = false;
 
   event MintingFinished();
 
   modifier canMint() {
-    require(!_whenMintingFinished);
+    require(!_mintingFinished);
     _;
   }
 
@@ -420,13 +407,13 @@ contract LYZEToken is ERC20, Ownable {
    * @param value The amount of tokens to mint.
    * @return A boolean that indicates if the operation was successful.
    */
-  function mint(address to, uint256 value) external onlyAdmin canMint returns (bool) {
+  function mint(address to, uint256 value) public onlyAdmin canMint returns (bool) {
     _mint(to, value);
     return true;
   }
 
-  function finishMinting() external onlyAdmin canMint returns (bool) {
-    _whenMintingFinished = true;
+  function finishMinting() public onlyAdmin canMint returns (bool) {
+    _mintingFinished = true;
     emit MintingFinished();
     return true;
   }
@@ -435,7 +422,7 @@ contract LYZEToken is ERC20, Ownable {
    * @dev Burns a specific amount of tokens.
    * @param value The amount of token to be burned.
    */
-  function burn(uint256 value) external onlyAdmin {
+  function burn(uint256 value) public onlyAdmin {
     _burn(msg.sender, value);
   }
 
@@ -444,38 +431,53 @@ contract LYZEToken is ERC20, Ownable {
    * @param from address The address which you want to send tokens from
    * @param value uint256 The amount of token to be burned
    */
-  function burnFrom(address from, uint256 value) external onlyAdmin {
+  function burnFrom(address from, uint256 value) public onlyAdmin {
     _burnFrom(from, value);
+  }
+
+  /**
+  * @dev MultiTransfer Unit
+  */
+  function multiTransferUnit() public view onlyAdmin returns (uint8) {
+    return _multiTransferUnit;
+  }
+
+  /**
+  * @dev Set MultiTransfer Unit
+  * @param unit The MultiTransfer Unit to set.
+  */
+  function setMultiTransferUnit(uint8 unit) public onlyAdmin {
+    _multiTransferUnit = unit;
   }
 
   /**
   * @dev Maximum MultiTransfer Count Allowed
   */
-  function getMaxMultiTransferCount() external view onlyAdmin returns (uint256) {
+  function maxMultiTransferCount() public view onlyAdmin returns (uint16) {
     return _maxMultiTransferCount;
   }
 
   /**
   * @dev Set Maximum MultiTransfer Count Allowed
-  * @param maxMultiTransferCount The Max Count to set.
+  * @param count The Max Count to set.
   */
-  function setMaxMultiTransferCount(uint256 maxMultiTransferCount) external onlyAdmin {
-    _maxMultiTransferCount = maxMultiTransferCount;
+  function setMaxMultiTransferCount(uint16 count) public onlyAdmin {
+    _maxMultiTransferCount = count;
   }
 
   /**
   * @dev Maximum MultiTransfer Value Allowed
   */
-  function getMaxMultiTransferValue() external view onlyAdmin returns (uint256) {
+  function maxMultiTransferValue() public view onlyAdmin returns (uint256) {
     return _maxMultiTransferValue;
   }
 
   /**
   * @dev Set Maximum MultiTransfer Value Allowed
-  * @param maxMultiTransferValue The Max Value to set.
+  * @param value The Max Value to set.
   */
-  function setMaxMultiTransferValue(uint256 maxMultiTransferValue) external onlyAdmin {
-    _maxMultiTransferValue = maxMultiTransferValue;
+  function setMaxMultiTransferValue(uint256 value) public onlyAdmin {
+    _maxMultiTransferValue = value;
   }
 
   /**
@@ -483,11 +485,11 @@ contract LYZEToken is ERC20, Ownable {
   * @param tos The address array to transfer to.
   * @param values The amount array to be transferred.
   */
-  function multiTransfer(address[] tos, uint256[] values) external onlyAdmin returns (bool) {
+  function multiTransfer(address[] tos, uint256[] values) public onlyAdmin returns (bool) {
     require(tos.length>0 && tos.length==values.length && tos.length<=_maxMultiTransferCount);
     for (uint256 i = 0; i < tos.length; ++i) {
       require(values[i]<=_maxMultiTransferValue);
-      uint256 value = values[i].mul(10**uint256(decimals()));
+      uint256 value = values[i].mul(10**uint256(multiTransferUnit()));
       _transfer(msg.sender, tos[i], value);
     }
     return true;
