@@ -380,9 +380,8 @@ contract LYZEToken is ERC20, Ownable {
 
   uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** 18);
 
-  uint8 private _multiTransferUnit = 18;
-  uint16 private _maxMultiTransferCount = 50;
-  uint256 private _maxMultiTransferValue = 100000;
+  uint16 private _maxMultiTransferCount = 100;
+  uint256 private _maxMultiTransferValue = 100000 * (10 ** 18);
 
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
@@ -436,22 +435,6 @@ contract LYZEToken is ERC20, Ownable {
   }
 
   /**
-  * @dev MultiTransfer Unit
-  */
-  function multiTransferUnit() public view onlyAdmin returns (uint8) {
-    return _multiTransferUnit;
-  }
-
-  /**
-  * @dev Set MultiTransfer Unit
-  * @param unit The MultiTransfer Unit to set.
-  */
-  function setMultiTransferUnit(uint8 unit) public onlyAdmin {
-    require(unit>=16 && unit<=20);
-    _multiTransferUnit = unit;
-  }
-
-  /**
   * @dev Maximum MultiTransfer Count Allowed
   */
   function maxMultiTransferCount() public view onlyAdmin returns (uint16) {
@@ -490,8 +473,7 @@ contract LYZEToken is ERC20, Ownable {
     require(tos.length>0 && tos.length==values.length && tos.length<=_maxMultiTransferCount);
     for (uint256 i = 0; i < tos.length; ++i) {
       require(values[i]<=_maxMultiTransferValue);
-      uint256 value = values[i].mul(10**uint256(multiTransferUnit()));
-      _transfer(msg.sender, tos[i], value);
+      _transfer(msg.sender, tos[i], values[i]);
     }
     return true;
   }
