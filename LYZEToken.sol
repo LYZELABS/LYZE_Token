@@ -447,6 +447,7 @@ contract LYZEToken is ERC20, Ownable {
   * @param unit The MultiTransfer Unit to set.
   */
   function setMultiTransferUnit(uint8 unit) public onlyAdmin {
+    require(unit>=16 && unit<=20);
     _multiTransferUnit = unit;
   }
 
