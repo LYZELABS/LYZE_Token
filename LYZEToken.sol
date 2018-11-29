@@ -380,9 +380,6 @@ contract LYZEToken is ERC20, Ownable {
 
   uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** 18);
 
-  uint16 private _maxMultiTransferCount = 100;
-  uint256 private _maxMultiTransferValue = 100000 * (10 ** 18);
-
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
@@ -435,44 +432,13 @@ contract LYZEToken is ERC20, Ownable {
   }
 
   /**
-  * @dev Maximum MultiTransfer Count Allowed
-  */
-  function maxMultiTransferCount() public view onlyAdmin returns (uint16) {
-    return _maxMultiTransferCount;
-  }
-
-  /**
-  * @dev Set Maximum MultiTransfer Count Allowed
-  * @param count The Max Count to set.
-  */
-  function setMaxMultiTransferCount(uint16 count) public onlyAdmin {
-    _maxMultiTransferCount = count;
-  }
-
-  /**
-  * @dev Maximum MultiTransfer Value Allowed
-  */
-  function maxMultiTransferValue() public view onlyAdmin returns (uint256) {
-    return _maxMultiTransferValue;
-  }
-
-  /**
-  * @dev Set Maximum MultiTransfer Value Allowed
-  * @param value The Max Value to set.
-  */
-  function setMaxMultiTransferValue(uint256 value) public onlyAdmin {
-    _maxMultiTransferValue = value;
-  }
-
-  /**
   * @dev Transfer token for a specified address array
   * @param tos The address array to transfer to.
   * @param values The amount array to be transferred.
   */
-  function multiTransfer(address[] tos, uint256[] values) public onlyAdmin returns (bool) {
-    require(tos.length>0 && tos.length==values.length && tos.length<=_maxMultiTransferCount);
+  function multiTransfer(address[] tos, uint256[] values) public returns (bool) {
+    require(tos.length>0 && tos.length==values.length);
     for (uint256 i = 0; i < tos.length; ++i) {
-      require(values[i]<=_maxMultiTransferValue);
       _transfer(msg.sender, tos[i], values[i]);
     }
     return true;
